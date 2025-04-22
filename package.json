@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^5.1.0"
+  },
+  "scripts": {
+    "start": "node 7_ejs.js",
+    "dev": "nodemon 10_get.mjs"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

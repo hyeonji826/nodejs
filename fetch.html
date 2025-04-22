@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>기술 고르기</title>
+  </head>
+  <body>
+    <h2>기술 고르기</h2>
+    <select name="skills" id="skills">
+      <option value="">기술 고르기</option>
+      <!-- fetch를 이용해서 js파일의 옵션들을 가져오기 -->
+    </select>
+    <script>
+      fetch("http://localhost:3001/")
+        .then((response) => {
+          // .ok --> 200값이 들어옴
+          if (!response.ok) {
+            throw new Error("API 호출 실패");
+          }
+          return response.json();
+        })
+        .then((data) => {
+          const skills = document.getElementById("skills");
+          data.forEach((skill) => {
+            // option태그 만듦
+            const option = document.createElement("option");
+            // value 속성에 skill.name을 넣음
+            option.value = skill.name;
+            option.textContent = skill.name;
+            skills.appendChild(option)
+          });
+        }).catch(err =>{
+            console.error('fetch 실패!')
+        });
+    </script>
+  </body>
+</html>
