@@ -5,6 +5,7 @@ import fs from "fs";
 const app = express();
 const port = 3000;
 
+// 설정정
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     // 파일 저장할 폴더 생성
@@ -30,6 +31,14 @@ app.post("/upload-single", upload.single("file"), (req, res) => {
   res.json({
     message: "단일 파일 업로드 성공",
     file: req.file,
+  });
+});
+
+app.post("/upload-multiple", upload.array("files", 5), (req, res) => {
+  console.log(req.files);
+  res.json({
+    message: "다중 파일 업로드 성공",
+    files: req.files,
   });
 });
 
