@@ -8,12 +8,14 @@
     "multer": "^1.4.5-lts.2",
     "mysql2": "^3.14.1",
     "sharp": "^0.34.1",
+    "socket": "^0.15.0",
+    "socket.io": "^4.8.1",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   },
   "scripts": {
-    "start": "node 7_ejs.js",
-    "dev": "nodemon 15_routing.mjs"
+    "start": "node 22_websocket_0513.mjs",
+    "dev": "nodemon 22_websocket_0513.mjs"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
