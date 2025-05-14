@@ -145,6 +145,32 @@
         if (e.key === "Enter") sendMessage();
       });
 
+      channelSelector.onchange = () => {
+        const newChannel = channelSelector.value;
+        if (newChannel !== currentChannel) {
+          socket.emit("changeChannel", { newChannel });
+          currentChannel = newChannel;
+          channelName.textContent = `[채널:${currentChannel}]`;
+          messages.innerHTML = "";
+        }
+      };
+
+      // 이모지
+      emojiBtn.onclick = () => {
+        emojiBox.style.display =
+          emojiBox.style.display === "block" ? "none" : "block";
+        emojiBox.style.top = emojiBtn.offsetTop - 50 + "px";
+        emojiBox.style.left = emojiBtn.offsetLeft - 0 + "px";
+      };
+
+      emojiBox.querySelectorAll("span").forEach((span) => {
+        span.onclick = () => {
+          messageInput.value += span.textContent;
+          emojiBox.style.display = "none";
+        };
+      });
+
+
       // 이벤트 전송
       socket.emit("join", { nickname, channel: currentChannel });
 

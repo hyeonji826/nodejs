@@ -12,6 +12,7 @@ import { createServer } from "http";
 import path from "path";
 import { Server } from "socket.io";
 import { fileURLToPath } from "url";
+import fs from "fs";
 
 const app = express();
 const server = createServer(app);
@@ -22,6 +23,8 @@ const io = new Server(server);
 // path.dirname: 디렉토리 이름만 추출
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+const logsDir = path.join(__dirname, "logs");
+if (!fs.existsSync(logsDir)) fs.mkdirSync(logsDir);
 
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -29,10 +32,11 @@ app.use(express.static(path.join(__dirname, "public")));
 const users = {};
 const channels = ["lobby", "sports", "programming", "music"];
 
+
 // 사용자가 접속 -> 클라이언트 소켓 이벤트 생성
 io.on("connection", (socket) => {
+  // join
   socket.on("join", ({ nickname, channel }) => {
-    // nickname 생성
     socket.nickname = nickname;
     socket.channel = channel;
     users[socket.id] = { nickname, channel };
@@ -63,12 +67,35 @@ io.on("connection", (socket) => {
         // 상대에게 전송
         io.to(receiverSocket).emit("whisper", payload);
         // 나한테도 보이게
-        socket.emit("whisper", payload)
+        socket.emit("whisper", payload);
       }
     } else {
       io.to(sender.channel).emit("message", payload); // 전체전송
     }
   });
+
+  // 채널 변경
+  socket.on("changeChannel", ({ newChannel }) => {
+    console.log(newChannel);
+    const oldChannel = socket.channel;
+    const nickname = socket.nickname;
+    socket.leave(oldChannel);
+    io.to(oldChannel).emit("message", {
+      user: "system",
+      text: `${nickname}님이 ${newChannel} 채널로 이동했습니다.`,
+    });
+    socket.channel = newChannel;
+    users[socket.id].channel = newChannel;
+    // 실제로 옮겨지는 것
+    socket.join(newChannel);
+
+    const joinMsg = { user: "system", text: `${nickname}님이 입장했습니다.` };
+    io.to(newChannel).emit("message", joinMsg);
+
+
+    updateUserList();
+  });
+
   // 사용자 퇴장
   socket.on("disconnect", () => {
     const user = users[socket.id];
@@ -78,7 +105,6 @@ io.on("connection", (socket) => {
         text: `${user.nickname}님이 퇴장했습니다.`,
       };
       io.to(user.channel).emit("message", msg);
-      delete users[socket.id];
 
       updateUserList();
     }
